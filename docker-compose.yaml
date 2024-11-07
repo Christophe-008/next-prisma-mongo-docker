@@ -1,25 +1,28 @@
-version: "3.8"
-
 services:
-    nextjs:
-        image: node:18 # Utilise une image officielle de Node.js
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: nextjs-app
         working_dir: /app
         volumes:
-            - .:/app
+            - ./:/app
         ports:
-            - "3000:3000"
-        command: sh -c "npm install && npm run dev"
+            - "3000:3000" #app
+            - "5555:5555" #Prisma studio
         environment:
-            - MONGO_URI=mongodb://root:example@mongo:27017/MongoDockerDB?authSource=admin
+            - DATABASE_URL=mongodb://mongo:27017/total_recall_api
         depends_on:
             - mongo
 
     mongo:
-        image: mongo:latest
-        environment:
-            MONGO_INITDB_ROOT_USERNAME: root
-            MONGO_INITDB_ROOT_PASSWORD: example
+        image: mongo:8
+        container_name: mongo-db
         ports:
             - "27017:27017"
         volumes:
-            - ./data:/data/db
+            - mongo-data:/data/db
+        command: --replSet rs0 #Init replica set
+
+volumes:
+    mongo-data:
