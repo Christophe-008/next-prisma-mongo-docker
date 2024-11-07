@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+    nextjs:
+        image: node:18 # Utilise une image officielle de Node.js
+        working_dir: /app
+        volumes:
+            - .:/app
+        ports:
+            - "3000:3000"
+        command: sh -c "npm install && npm run dev"
+        environment:
+            - MONGO_URI=mongodb://root:example@mongo:27017/yourDatabaseName?authSource=admin
+        depends_on:
+            - mongo
+
+    mongo:
+        image: mongo:latest
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: example
+        ports:
+            - "27017:27017"
+        volumes:
+            - ./data:/data/db
